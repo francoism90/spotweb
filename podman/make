@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Build images
+
+podman build \
+    -t spotweb-nginx \
+    --env=../../.env \
+    --file=build/nginx/Dockerfile
+
+podman build \
+    -t spotweb-app \
+    --env=../../.env \
+    --file=build/app/Dockerfile

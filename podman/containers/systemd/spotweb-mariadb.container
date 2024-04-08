@@ -1,0 +1,15 @@
+[Unit]
+Description=MariaDB container
+
+[Service]
+Restart=always
+
+[Container]
+Image=docker.io/library/mariadb:latest
+Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U
+EnvironmentFile=%h/.config/containers/systemd/spotweb/mariadb.env
+Network=spotweb.network
+PublishPort=3308:3306
+
+[Install]
+WantedBy=multi-user.target default.target

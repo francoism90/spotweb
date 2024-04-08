@@ -1,0 +1,3 @@
+[submodule "spotweb"]
+	path = spotweb
+	url = git@github.com:spotweb/spotweb.git

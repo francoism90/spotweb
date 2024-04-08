@@ -1,0 +1,21 @@
+[Unit]
+Description=App container
+
+[Service]
+EnvironmentFile=%h/.config/containers/systemd/spotweb/app.env
+TimeoutStartSec=900
+Restart=always
+
+[Container]
+Image=localhost/spotweb-app
+Volume=${APP_PATH}:/app:rw,z,U
+User=${APP_UID}
+Group=${APP_GID}
+UserNS=keep-id:uid=${APP_UID},gid=${APP_GID}
+Secret=tlscert,target=/etc/certs/cert.pem,mode=0600
+Secret=tlskey,target=/etc/certs/key.pem,mode=0600
+Network=spotweb.network
+ExposeHostPort=9000
+
+[Install]
+WantedBy=multi-user.target default.target
