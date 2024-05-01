@@ -1,7 +1,7 @@
 [Unit]
 Description=Spotweb container
-Requires=spotweb-mariadb.service spotweb-app.service
-After=spotweb-mariadb.service spotweb-app.service
+Requires=spotweb-app.service
+After=spotweb-app.service
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/app.env
@@ -9,17 +9,16 @@ Restart=always
 
 [Container]
 Image=localhost/spotweb-nginx
+AutoUpdate=local
 Volume=${APP_PATH}:/app:ro,z
 User=${APP_UID}
 Group=${APP_GID}
 UserNS=keep-id:uid=${APP_UID},gid=${APP_GID}
-HostName=spotweb.lan
 Network=spotweb.network
-PublishPort=8002:8080
 Label=traefik.enable=true
 Label=traefik.http.routers.spotweb.entrypoints=websecure
 Label=traefik.http.routers.spotweb.tls=true
-Label=traefik.http.routers.spotweb.rule=Host'(`spotweb.lan`)'
+Label=traefik.http.routers.spotweb.rule="Host(`spotweb.lan`)"
 Label=traefik.http.services.spotweb.loadbalancer.server.port="8080"
 
 [Install]

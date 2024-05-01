@@ -1,5 +1,7 @@
 [Unit]
 Description=App container
+Requires=spotweb-mariadb.service
+After=spotweb-mariadb.service
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/app.env
@@ -8,12 +10,11 @@ Restart=always
 
 [Container]
 Image=localhost/spotweb-app
+AutoUpdate=local
 Volume=${APP_PATH}:/app:rw,z,U
 User=${APP_UID}
 Group=${APP_GID}
 UserNS=keep-id:uid=${APP_UID},gid=${APP_GID}
-Secret=tlscert,target=/etc/certs/cert.pem,mode=0600
-Secret=tlskey,target=/etc/certs/key.pem,mode=0600
 Network=spotweb.network
 ExposeHostPort=9000
 
