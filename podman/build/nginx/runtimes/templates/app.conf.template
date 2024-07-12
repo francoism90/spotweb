@@ -1,14 +1,12 @@
-upstream reverb {
-    server systemd-spotweb-app:6001;
-    keepalive 32;
-}
+# Resolver
+resolver ${NGINX_LOCAL_RESOLVERS} valid=300s;
 
 server {
-    listen 8080;
-    listen [::]:8080;
+    listen ${NGINX_PORT};
+    listen [::]:${NGINX_PORT};
     http2 on;
 
-    server_name spotweb.lan;
+    server_name ${NGINX_HOST};
     set $base /app/spotweb;
     root $base;
 

@@ -9,12 +9,13 @@ TimeoutStartSec=900
 Restart=always
 
 [Container]
-Image=localhost/spotweb-app
+Image=localhost/spotweb-app:latest
 AutoUpdate=local
-Volume=${APP_PATH}:/app:rw,z,U
+PodmanArgs=--cpus=2
 User=${APP_UID}
 Group=${APP_GID}
 UserNS=keep-id:uid=${APP_UID},gid=${APP_GID}
+Volume=${APP_PATH}:/app:rw,z,U
 Network=spotweb.network
 ExposeHostPort=9000
 

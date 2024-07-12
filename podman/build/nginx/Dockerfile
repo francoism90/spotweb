@@ -1,9 +1,10 @@
-FROM nginxinc/nginx-unprivileged:mainline-alpine
+FROM docker.io/nginxinc/nginx-unprivileged:mainline-alpine
 
 ARG UID=1000
 ARG GID=$UID
 
 ENV TZ=UTC
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 
 USER root
 
@@ -15,37 +16,43 @@ RUN apk add --no-cache --virtual .build-deps \
     alpine-sdk \
     clang \
     linux-headers \
-    python3 \
-    curl \
-    unzip
+    python3
 
 RUN apk add --no-cache --virtual .run-deps \
-    openssl-dev \
+    ca-certificates \
+    curl \
     brotli-dev \
-    pcre2-dev \
-    libxml2-dev \
     ffmpeg-dev \
-    fdk-aac \
     freetype \
     fribidi \
+    git \
     gmp \
     gnu-libiconv \
     gsm \
     jpeg \
     lame \
     libass \
+    libcrypto3 \
     libogg \
+    libpng \
+    librsvg \
     libtheora \
     libva \
     libvdpau \
     libvorbis \
     libvpx \
     libwebp \
+    libxml2-dev \
+    fdk-aac \
+    musl \
     numactl \
     opencore-amr \
     openjpeg \
+    openssl-dev \
+    pcre2-dev \
     speex \
     tzdata \
+    unzip \
     x264 \
     x265 \
     xvidcore \
@@ -75,7 +82,7 @@ RUN cd /usr/local/src \
 
 RUN apk del .build-deps
 
-COPY runtimes/. /etc/nginx
+COPY --chown=$UID:$GID runtimes/. /etc/nginx
 
 STOPSIGNAL SIGQUIT
 

@@ -5,9 +5,11 @@
 podman build \
     -t spotweb-nginx \
     --file=build/nginx/Dockerfile \
-    --env=../../.env
+    --env=../../.env \
+    --no-cache
 
 podman build \
     -t spotweb-app \
     --file=build/app/Dockerfile \
-    --env=../../.env
+    --env=../../.env \
+    --no-cache
