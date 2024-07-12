@@ -7,9 +7,9 @@ Restart=always
 [Container]
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
+EnvironmentFile=%h/.config/containers/systemd/spotweb/mariadb.env
 PodmanArgs=--cpus=1
 Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U
-EnvironmentFile=%h/.config/containers/systemd/spotweb/mariadb.env
 Network=spotweb.network
 PublishPort=3308:3306
 
