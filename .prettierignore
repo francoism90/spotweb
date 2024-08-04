@@ -1,0 +1,7 @@
+**/.git
+**/.hg
+**/.svn
+/node_modules
+/spotweb
+composer.lock
+yarn.lock
