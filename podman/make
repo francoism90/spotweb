@@ -1,9 +1,9 @@
 #!/bin/sh
 
 podman build \
-    -t spotweb-nginx \
-    --file=build/nginx/Dockerfile
+    -t spotweb-nginx:latest \
+    -f build/nginx/Dockerfile
 
 podman build \
-    -t spotweb-app \
-    --file=build/app/Dockerfile
+    -t spotweb-app:latest \
+    -f build/app/Dockerfile

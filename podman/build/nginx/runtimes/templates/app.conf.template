@@ -1,9 +1,8 @@
-# Resolver
 resolver ${NGINX_LOCAL_RESOLVERS} valid=300s;
 
 server {
-    listen ${NGINX_PORT};
-    listen [::]:${NGINX_PORT};
+    listen 8080;
+    listen [::]:8080;
     http2 on;
 
     server_name ${NGINX_HOST};
