@@ -4,7 +4,7 @@ Requires=spotweb-app.service
 After=spotweb-app.service
 
 [Container]
-Image=localhost/spotweb-nginx:latest
+Image=localhost/spotweb:latest
 AutoUpdate=local
 LogDriver=none
 User=${UID}
