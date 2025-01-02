@@ -17,7 +17,7 @@ ExposeHostPort=8000
 ExposeHostPort=8080
 
 [Service]
-EnvironmentFile=%h/.config/containers/systemd/spotweb/app.env
+EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
 TimeoutStartSec=900
 Restart=always
 
