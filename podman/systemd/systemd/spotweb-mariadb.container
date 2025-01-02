@@ -1,17 +1,19 @@
 [Unit]
 Description=MariaDB container
 
-[Service]
-Restart=always
-
 [Container]
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
+LogDriver=none
 EnvironmentFile=%h/.config/containers/systemd/spotweb/mariadb.env
-PodmanArgs=--cpus=1
+ShmSize=100m
 Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U
 Network=spotweb.network
-PublishPort=3308:3306
+PublishPort=3306:3306
+
+[Service]
+TimeoutStartSec=300
+Restart=always
 
 [Install]
-WantedBy=multi-user.target default.target
+WantedBy=multi-user.target

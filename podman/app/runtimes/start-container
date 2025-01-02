@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+set -e
+
+if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "www-data" ]; then
+    echo "You should set SUPERVISOR_PHP_USER to either 'www-data' or 'root'."
+    exit 1
+fi
+
+if [ "$1" != "" ]; then
+    exec "$@"
+else
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi

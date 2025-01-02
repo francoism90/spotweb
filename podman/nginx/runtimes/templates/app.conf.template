@@ -1,12 +1,13 @@
-resolver ${NGINX_LOCAL_RESOLVERS} valid=300s;
+resolver ${NGINX_LOCAL_RESOLVERS} valid=60s;
+resolver_timeout 5s;
 
 server {
-    listen 8080;
-    listen [::]:8080;
+    listen 8000;
+    listen [::]:8000;
     http2 on;
 
-    server_name ${NGINX_HOST};
-    set $base /app/spotweb;
+    server_name localhost;
+    set $base /app;
     root $base;
 
     # security
@@ -15,12 +16,12 @@ server {
     # index
     index index.php;
 
+    error_page 404 /index.php;
+
     # root
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
-
-    error_page 404 /index.php;
 
     # additional config
     include /etc/nginx/config/general.conf;
