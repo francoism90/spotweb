@@ -1,0 +1,3 @@
+#!/bin/sh
+podman build -t spotweb-app:latest -f ./containers/app/Dockerfile "$@"
+podman build -t spotweb-nginx:latest -f ./containers/nginx/Dockerfile "$@"

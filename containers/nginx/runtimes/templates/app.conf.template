@@ -2,9 +2,8 @@ resolver ${NGINX_LOCAL_RESOLVERS} valid=60s;
 resolver_timeout 5s;
 
 server {
-    listen 8000;
-    listen [::]:8000;
-    http2 on;
+    listen 8080 reuseport;
+    listen [::]:8080 reuseport;
 
     server_name localhost;
     set $base /app;

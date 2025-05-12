@@ -9,11 +9,11 @@ EnvironmentFile=%h/.config/containers/systemd/spotweb/config/mariadb.env
 ShmSize=100m
 Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U
 Network=spotweb.network
-PublishPort=3306:3306
+ExposeHostPort=3306
 
 [Service]
-TimeoutStartSec=300
-Restart=always
+TimeoutStartSec=90
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

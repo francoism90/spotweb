@@ -7,17 +7,15 @@ After=spotweb-mariadb.service
 Image=localhost/spotweb-app:latest
 AutoUpdate=local
 LogDriver=none
-User=${UID}
-Group=${UID}
-UserNS=keep-id:uid=${UID},gid=${GID}
+UserNS=keep-id
 Volume=${APP_PATH}:/app:rw,z,U
 Network=spotweb.network
 ExposeHostPort=9000
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
-TimeoutStartSec=900
-Restart=always
+TimeoutStartSec=60
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
