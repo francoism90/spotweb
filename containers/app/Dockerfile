@@ -35,6 +35,7 @@ RUN apt-get update && apt-get upgrade -y \
 
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
 COPY runtimes/php-production.ini /usr/local/etc/php/conf.d/99-user.ini
+COPY runtimes/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 RUN chmod +x /usr/local/bin/container-entrypoint.sh
