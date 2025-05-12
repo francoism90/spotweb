@@ -9,7 +9,7 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=${TZ}
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4 --force-stderr --nodaemonize"
+ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4"
 ENV SPOTWEB_USER="www-data"
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
