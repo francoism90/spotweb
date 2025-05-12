@@ -4,22 +4,19 @@ Requires=spotweb-app.service
 After=spotweb-app.service
 
 [Container]
-Image=localhost/spotweb:latest
+Image=localhost/spotweb-nginx:latest
 AutoUpdate=local
 LogDriver=none
-User=${UID}
-Group=${UID}
-UserNS=keep-id:uid=${UID},gid=${GID}
+UserNS=keep-id
 Volume=${APP_PATH}:/app:ro,z
-Network=caddy.network
+Network=proxy.network
 Network=spotweb.network
-ExposeHostPort=8000
 ExposeHostPort=8080
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
-TimeoutStartSec=900
-Restart=always
+TimeoutStartSec=60
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
