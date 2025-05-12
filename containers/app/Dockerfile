@@ -9,7 +9,7 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=${TZ}
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-ENV SPOTWEB_COMMAND="/usr/bin/php-fpm --force-stderr --nodaemonize"
+ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4 --force-stderr --nodaemonize"
 ENV SPOTWEB_USER="docker"
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
@@ -35,16 +35,14 @@ RUN apt-get update && apt-get upgrade -y \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && apt-get install -y mariadb-client
 
+RUN usermod --non-unique --uid ${UID} www-data \
+    && groupmod --non-unique --gid ${GID} www-data
+
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
-COPY runtimes/php-production.ini /usr/local/etc/php/conf.d/99-user.ini
-COPY runtimes/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY runtimes/php-production.ini /etc/php/8.4/fpm/conf.d/99-user.ini
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 RUN chmod +x /usr/local/bin/container-entrypoint.sh
-
-RUN userdel -r ubuntu
-RUN groupadd --force -g ${GID} docker \
-    && useradd -ms /bin/bash --no-user-group -g ${GID} -u ${UID} docker
 
 RUN apt-get -y autoremove -y \
     && apt-get clean -y \
