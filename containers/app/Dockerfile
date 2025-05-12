@@ -40,6 +40,8 @@ RUN usermod --non-unique --uid ${UID} www-data \
 
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
 COPY runtimes/php-production.ini /etc/php/8.4/fpm/conf.d/99-user.ini
+COPY runtimes/php-fpm.conf /etc/php/8.4/fpm/php-fpm.conf
+COPY runtimes/www.conf /etc/php/8.4/fpm/pool.d/www.conf
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 RUN chmod +x /usr/local/bin/container-entrypoint.sh
