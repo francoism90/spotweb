@@ -8,9 +8,8 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=${TZ}
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
-ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4"
-ENV SPOTWEB_USER="www-data"
+ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4 --nodaemonize -F"
+ENV SPOTWEB_USER="docker"
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
@@ -35,8 +34,9 @@ RUN apt-get update && apt-get upgrade -y \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && apt-get install -y mariadb-client
 
-RUN usermod --non-unique --uid ${UID} www-data \
-    && groupmod --non-unique --gid ${GID} www-data
+RUN userdel -r ubuntu
+RUN groupadd --force -g ${GID} docker \
+    && useradd -ms /bin/bash --no-user-group -g ${GID} -u ${UID} docker
 
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
 COPY runtimes/php-fpm.conf /etc/php/8.4/fpm/php-fpm.conf
