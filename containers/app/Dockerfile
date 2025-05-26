@@ -1,4 +1,4 @@
-FROM docker.io/library/php:8.4-cli
+FROM docker.io/library/php:8.4-fpm
 
 ARG UID=1000
 ARG GID=$UID
@@ -9,7 +9,7 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=${TZ}
-ENV SPOTWEB_COMMAND="/usr/sbin/php-fpm8.4 --nodaemonize -F"
+ENV SPOTWEB_COMMAND="php-fpm --nodaemonize -F"
 ENV SPOTWEB_USER="docker"
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
@@ -19,7 +19,7 @@ RUN sed -i 's/^Components: main$/& contrib non-free/' /etc/apt/sources.list.d/de
 RUN apt-get update && apt-get upgrade -y \
     && mkdir -p /etc/apt/keyrings \
     && apt-get install -y gnupg curl ca-certificates zip unzip git sqlite3 postgresql-common dnsutils fswatch \
-    && apt-get install -y libcap2-bin libpng-dev librsvg2-bin libjpeg-dev libfreetype6-dev libwebp-dev libxpm-dev \
+    && apt-get install -y libpng-dev librsvg2-bin libjpeg-dev libfreetype6-dev libwebp-dev libxpm-dev \
     && apt-get install -y ffmpeg gifsicle jpegoptim optipng pngquant \
     && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
     && apt-get install -y postgresql-client-${POSTGRES_VERSION}
@@ -28,12 +28,12 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 RUN install-php-extensions @composer apcu bcmath bz2 calendar ev event exif gd \
     gettext igbinary imagick imap inotify intl msgpack opcache pcntl pcov \
-    pdo_mysql pdo_pgsql pgsql redis sockets swoole uv zip
+    pdo_mysql pdo_pgsql pgsql redis sockets uv zip
 
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
+COPY runtimes/php-production.ini /etc/php/8.4/fpm/conf.d/99-user.ini
 COPY runtimes/php-fpm.conf /etc/php/8.4/fpm/php-fpm.conf
 COPY runtimes/www.conf /etc/php/8.4/fpm/pool.d/www.conf
-COPY runtimes/php-production.ini /etc/php/8.4/fpm/conf.d/99-user.ini
 
 RUN chmod +x /usr/local/bin/container-entrypoint.sh
 
