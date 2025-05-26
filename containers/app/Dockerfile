@@ -26,14 +26,15 @@ RUN apt-get update && apt-get upgrade -y \
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN install-php-extensions @composer apcu bcmath bz2 calendar ev event exif gd \
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
+    && install-php-extensions @composer apcu bcmath bz2 calendar ev event exif gd \
     gettext igbinary imagick imap inotify intl msgpack opcache pcntl pcov \
     pdo_mysql pdo_pgsql pgsql redis sockets uv zip
 
 COPY runtimes/container-entrypoint.sh /usr/local/bin/container-entrypoint.sh
 COPY runtimes/php-production.ini /etc/php/8.4/fpm/conf.d/99-user.ini
-COPY runtimes/php-fpm.conf /etc/php/8.4/fpm/php-fpm.conf
-COPY runtimes/www.conf /etc/php/8.4/fpm/pool.d/www.conf
+COPY runtimes/php-fpm.conf /usr/local/etc/php-fpm.conf
+COPY runtimes/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN chmod +x /usr/local/bin/container-entrypoint.sh
 
