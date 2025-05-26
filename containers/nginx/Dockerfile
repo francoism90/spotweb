@@ -12,16 +12,9 @@ ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
-RUN apt-get update && apt-get upgrade -y
-
-RUN apt-get install -y \
-    gnupg \
-    curl \
-    ca-certificates \
-    zip \
-    unzip \
-    git \
-    dnsutils
+RUN apt-get update && apt-get upgrade -y \
+    && mkdir -p /etc/apt/keyrings \
+    && apt-get install -y build-essential gnupg curl ca-certificates zip unzip git dnsutils libssl-dev
 
 RUN usermod --non-unique --uid ${UID} nginx \
     && groupmod --non-unique --gid ${GID} nginx
@@ -30,7 +23,7 @@ COPY --chown=${UID}:${GID} runtimes/ /etc/nginx
 
 RUN apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/local/src/*
 
 EXPOSE 8080
 
