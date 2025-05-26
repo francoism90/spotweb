@@ -1,7 +1,7 @@
 [Unit]
 Description=App container
-Requires=spotweb-mariadb.service
-After=spotweb-mariadb.service
+Requires=spotweb-pgsql.service
+After=spotweb-pgsql.service
 
 [Container]
 Image=localhost/spotweb-app:latest
