@@ -1,22 +1,16 @@
 [Unit]
 Description=Spotweb container
-Requires=spotweb-app.service
-After=spotweb-app.service
+Requires=spotweb-mariadb.service
 
 [Container]
-Image=localhost/spotweb-nginx:latest
+Image=spotweb.build
 AutoUpdate=local
 LogDriver=none
 UserNS=keep-id
-Volume=${APP_PATH}:/app:ro,z
-Network=proxy.network
 Network=spotweb.network
-ExposeHostPort=8080
+PublishPort=8085:443
+PublishPort=8085:443/udp
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
-TimeoutStartSec=60
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
+TimeoutStartSec=90
