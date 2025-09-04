@@ -1,0 +1,45 @@
+FROM docker.io/dunglas/frankenphp:latest AS builder
+
+ARG USER=docker
+
+ENV SERVER_NAME=:8080
+ENV SERVER_ROOT=/app
+
+WORKDIR /app
+
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends git zip unzip
+
+RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
+
+RUN install-php-extensions \
+	pdo_mysql \
+	gd \
+	intl \
+	zip \
+	opcache
+
+RUN \
+    useradd ${USER}; \
+    setcap -r /usr/local/bin/frankenphp; \
+    chown -R ${USER}:${USER} /config/caddy /data/caddy /app
+
+EXPOSE 8080
+
+FROM builder as stage
+
+WORKDIR /app
+
+RUN rm -rf /app/*
+
+RUN git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app
+
+FROM builder as production
+
+WORKDIR /app
+
+COPY --from=stage /app /app
+
+RUN chown -R docker:docker /app
+
+USER docker
