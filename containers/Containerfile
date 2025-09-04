@@ -12,12 +12,12 @@ RUN apt-get update && apt-get upgrade -y \
 RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
 
 RUN install-php-extensions \
-	pdo_mysql \
+    pdo_mysql \
     gettext \
-	gd \
-	intl \
-	zip \
-	opcache
+    gd \
+    intl \
+    zip \
+    opcache
 
 RUN \
     useradd ${USER}; \
