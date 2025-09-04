@@ -2,7 +2,6 @@ FROM docker.io/dunglas/frankenphp:latest AS builder
 
 ARG USER=docker
 
-ENV SERVER_NAME=:8080
 ENV SERVER_ROOT=/app
 
 WORKDIR /app
@@ -22,10 +21,8 @@ RUN install-php-extensions \
 
 RUN \
     useradd ${USER}; \
-    setcap -r /usr/local/bin/frankenphp; \
+    setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp; \
     chown -R ${USER}:${USER} /config/caddy /data/caddy
-
-EXPOSE 8080
 
 FROM builder as stage
 
@@ -40,6 +37,8 @@ FROM builder as production
 WORKDIR /app
 
 COPY --from=stage /app /app
+
+COPY containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
 
 RUN chown -R docker:docker /app
 

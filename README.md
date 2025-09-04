@@ -1,8 +1,5 @@
 # Spotweb
 
-## Installation
+This a example of a Spotweb docker setup using Podman and FrankenPHP.
 
-1. `git clone https://github.com/francoism90/spotweb.git`
-2. `cd spotweb`
-3. `git clone https://github.com/spotweb/spotweb.git app`
-4. `cd podman` && `./make`
+After install, it should be available at <https://localhost:8085/>.
