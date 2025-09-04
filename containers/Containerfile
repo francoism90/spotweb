@@ -14,6 +14,7 @@ RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
 
 RUN install-php-extensions \
 	pdo_mysql \
+    gettext \
 	gd \
 	intl \
 	zip \
@@ -22,7 +23,7 @@ RUN install-php-extensions \
 RUN \
     useradd ${USER}; \
     setcap -r /usr/local/bin/frankenphp; \
-    chown -R ${USER}:${USER} /config/caddy /data/caddy /app
+    chown -R ${USER}:${USER} /config/caddy /data/caddy
 
 EXPOSE 8080
 
