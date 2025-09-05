@@ -8,8 +8,7 @@ AutoUpdate=local
 LogDriver=none
 UserNS=keep-id
 Network=spotweb.network
-PublishPort=8085:443
-PublishPort=8085:443/udp
+PublishPort=8080:8080
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env

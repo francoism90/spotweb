@@ -3,6 +3,7 @@ FROM docker.io/dunglas/frankenphp:latest AS builder
 ARG USER=docker
 
 ENV SERVER_ROOT=/app
+ENV SERVER_NAME=:8080
 
 WORKDIR /app
 
