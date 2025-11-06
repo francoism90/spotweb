@@ -13,6 +13,7 @@ _ide_helper.php
 /.pnpm-store
 /.vscode
 /.zed
+/app
 /containers/systemd
 /docs
 /node_modules

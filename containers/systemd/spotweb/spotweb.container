@@ -12,4 +12,7 @@ PublishPort=8080:8080
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
+Restart=always
+RestartSec=5
 TimeoutStartSec=90
+TimeoutStopSec=30
