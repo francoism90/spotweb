@@ -5,7 +5,6 @@ Requires=spotweb-mariadb.service
 [Container]
 Image=spotweb.build
 AutoUpdate=local
-LogDriver=none
 UserNS=keep-id
 Network=spotweb.network
 PublishPort=8080:8080

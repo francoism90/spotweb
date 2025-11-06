@@ -4,7 +4,6 @@ Description=MariaDB container
 [Container]
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
-LogDriver=none
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/mariadb.env
 ShmSize=100m
 Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U
