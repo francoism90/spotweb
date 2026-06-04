@@ -8,7 +8,7 @@ ENV SERVER_NAME=:8080
 WORKDIR /app
 
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends git zip unzip vim-tiny
+    apt-get install -y --no-install-recommends git zip unzip
 
 RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
     install-php-extensions \
