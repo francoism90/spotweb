@@ -1,12 +1,13 @@
 [Unit]
 Description=Spotweb container
-Requires=spotweb-mariadb.service
+Requires=spotweb-mariadb.container
 
 [Container]
 Image=spotweb.build
 AutoUpdate=local
 Network=spotweb.network
-PublishPort=8080:8080
+Network=proxy.network
+ExposeHostPort=8080
 
 [Service]
 EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
