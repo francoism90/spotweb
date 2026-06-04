@@ -14,7 +14,8 @@ _ide_helper.php
 /.vscode
 /.zed
 /app
-/containers/systemd
+/containers/*
+!/containers/runtimes
 /docs
 /node_modules
 /tests
