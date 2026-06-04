@@ -8,7 +8,7 @@ ENV SERVER_NAME=:8080
 WORKDIR /app
 
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends git zip unzip
+    apt-get install -y --no-install-recommends git zip unzip vim-tiny
 
 RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
     install-php-extensions \
@@ -19,7 +19,7 @@ RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
     zip \
     opcache
 
-RUN useradd --system --no-create-home --shell /sbin/nologin ${USER}
+RUN useradd --system --no-create-home --home-dir /app --shell /sbin/nologin ${USER}
 RUN chown -R ${USER}:${USER} /config /data
 
 RUN apt-get autoremove -y && apt-get clean -y && \
@@ -38,5 +38,7 @@ WORKDIR /app
 
 COPY --chown=docker:docker --from=stage /app /app
 COPY --chown=docker:docker containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
+
+RUN chown -R docker:docker /app
 
 USER docker
