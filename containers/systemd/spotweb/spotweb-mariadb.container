@@ -1,5 +1,7 @@
 [Unit]
 Description=MariaDB container
+After=spotweb.container
+BindsTo=spotweb.container
 
 [Container]
 Image=docker.io/library/mariadb:latest
