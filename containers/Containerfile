@@ -1,44 +1,66 @@
-FROM docker.io/dunglas/frankenphp:latest AS builder
+FROM docker.io/dunglas/frankenphp:latest
 
-ARG USER=docker
+ARG UID=1000
+ARG GID=1000
+ARG PHP_EXTENSIONS=""
 
+WORKDIR /app
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+ENV LANG=C.UTF-8
 ENV SERVER_ROOT=/app
-ENV SERVER_NAME=:8080
+ENV SERVER_NAME=:8000
 
-WORKDIR /app
+# Set timezone
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends git zip unzip
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    gnupg curl ca-certificates libcap2-bin zip unzip \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
-    install-php-extensions \
-    pdo_mysql \
-    gettext \
-    gd \
-    intl \
-    zip \
-    opcache
+# Create non-root user
+RUN groupadd --force -g ${GID} docker \
+    && useradd -u ${UID} -g docker -d /home/docker -s /bin/bash -m docker
 
-RUN useradd --system --no-create-home --home-dir /app --shell /sbin/nologin ${USER}
-RUN chown -R ${USER}:${USER} /config /data
+# Create directories and set ownership
+RUN mkdir -p /app /config /data \
+    && chown -R docker:docker /app /config /data
 
-RUN apt-get autoremove -y && apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# PHP Configuration
+RUN cp ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 
-FROM builder as stage
+# Install PHP extensions
+RUN install-php-extensions @composer \
+    apcu bcmath exif ffi gd opcache \
+    igbinary imagick inotify intl \
+    pdo_mysql gettext zip
 
-WORKDIR /app
+# Install additional PHP extensions if specified
+RUN if [ -n "$PHP_EXTENSIONS" ]; then \
+    install-php-extensions $PHP_EXTENSIONS; \
+fi
 
-RUN rm -rf /app/* && \
-    git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app
+# Custom PHP configuration
+COPY containers/runtimes/php-production.ini /usr/local/etc/php/conf.d/xx-php-user.ini
 
-FROM builder as production
+# Strip file capabilities from frankenphp
+RUN setcap -r /usr/local/bin/frankenphp
 
-WORKDIR /app
+# Install Spotweb
+RUN rm -rf /app/* \
+    && git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app \
+    && chown -R docker:docker /app \
+    && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md
 
-COPY --chown=docker:docker --from=stage /app /app
+# Copy configuration files
 COPY --chown=docker:docker containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
 
-RUN chown -R docker:docker /app
-
+# Run as root so the entrypoint can renumber the "docker" user to the
+# runtime PUID/PGID before dropping privileges
 USER docker
+
+EXPOSE 8000
