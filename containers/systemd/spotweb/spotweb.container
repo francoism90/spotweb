@@ -2,7 +2,6 @@
 [Unit]
 Description=Spotweb container
 Requires=spotweb-mariadb.container
-After=spotweb-mariadb.container
 
 [Container]
 Image=ghcr.io/francoism90/spotweb:latest
