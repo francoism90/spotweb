@@ -1,3 +1,4 @@
 # FileName=spotweb-mariadb
 [Volume]
+VolumeName=spotweb-mariadb
 Label=spotweb-mariadb

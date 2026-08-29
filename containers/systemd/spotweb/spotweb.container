@@ -10,7 +10,7 @@ AutoUpdate=registry
 UserNS=keep-id
 Environment=PUID=1000
 Environment=PGID=1000
-Volume=%h/workspace/spotweb/dbsettings.inc.php:/app/dbsettings.inc.php:rw,z
+Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
 Network=spotweb.network
 PublishPort=8000:8000
 

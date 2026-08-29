@@ -17,10 +17,21 @@ if [ "$(id -u)" = '0' ]; then
         usermod -o -u "${PUID}" spotweb
     fi
 
-    chown -R spotweb:spotweb /app /config /data
+    chown -R spotweb:spotweb /app /data /etc/spotweb /config
 
     exec gosu spotweb "$0" "$@"
 fi
+
+# Seed the persisted config on first run, then point Spotweb's own
+# dbsettings.inc.php path at it so writes (e.g. from install.php) land on
+# the host-mounted /etc/spotweb volume instead of the container's writable
+# layer. Kept out of /config and /data -- FrankenPHP/Caddy already use those
+# (XDG_CONFIG_HOME/XDG_DATA_HOME) for their own autosave config and TLS state.
+if [ ! -f /etc/spotweb/dbsettings.inc.php ]; then
+    cp /usr/local/share/spotweb/dbsettings.inc.php.dist /etc/spotweb/dbsettings.inc.php
+fi
+
+ln -sf /etc/spotweb/dbsettings.inc.php /app/dbsettings.inc.php
 
 # Hand off to the base frankenphp image's own entrypoint, which turns the
 # inherited CMD (--config /etc/frankenphp/Caddyfile --adapter caddyfile)

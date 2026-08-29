@@ -27,8 +27,8 @@ RUN groupadd --force -g ${GID} spotweb \
     && useradd -u ${UID} -g spotweb -d /home/spotweb -s /bin/bash -m spotweb
 
 # Create directories and set ownership
-RUN mkdir -p /app /config /data \
-    && chown -R spotweb:spotweb /app /config /data
+RUN mkdir -p /app /etc/spotweb \
+    && chown -R spotweb:spotweb /app /config /data /etc/spotweb
 
 # PHP Configuration
 RUN cp ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
@@ -57,7 +57,7 @@ RUN rm -rf /app/* \
     && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md
 
 # Copy configuration files
-COPY --chown=spotweb:spotweb containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
+COPY --chown=spotweb:spotweb containers/runtimes/dbsettings.inc.php /usr/local/share/spotweb/dbsettings.inc.php.dist
 
 # Entrypoint
 COPY --chmod=755 containers/runtimes/entrypoint.sh /usr/local/bin/entrypoint.sh

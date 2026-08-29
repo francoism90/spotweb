@@ -2,32 +2,23 @@
 
 This a example of a Spotweb docker setup using Podman and FrankenPHP.
 
+## Disclaimer
+
+This setup is intended for locating abandonware — software (e.g. old games)
+whose licenses have expired or are no longer maintained or enforced. I'm not
+responsible for the content indexed or how this instance is used.
+
 ## Install
 
-At first install, enter the container:
+On first boot, the container seeds `config/dbsettings.inc.php` on the host from
+the image's bundled default (already pointed at the included MariaDB
+container). That file is bind-mounted into the container and symlinked to
+`/app/dbsettings.inc.php`, so anything Spotweb itself writes there — such as
+during install — persists automatically; no manual copying required.
 
-```bash
-podman exec -ti systemd-spotweb /bin/bash
-```
-
-Remove the current `dbsettings.inc.php`:
-
-```bash
-rm -rf dbsettings.inc.php
-```
-
-After installing using <http://localhost:8080/install.php>, sync the new `dbsettings.inc.php` to `containers/runtimes/dbsettings.inc.php`:
-
-```bash
-cat dbsettings.inc.php
-```
-
-Restart the containers:
-
-```bash
-systemctl --user restart spotweb
-```
+Run the installer at <http://localhost:8000/install.php> to set up the
+database schema and initial settings.
 
 ## Usage
 
-After install, it should be available at <http://localhost:8080/>.
+After install, it should be available at <http://localhost:8000/>.
