@@ -1,0 +1,7 @@
+# FileName=spotweb
+[Build]
+ImageTag=localhost/spotweb:latest
+Environment=UID=1000
+Environment=GID=1000
+File=%h/workspace/spotweb/runtimes/Containerfile
+SetWorkingDirectory=%h/workspace/spotweb
