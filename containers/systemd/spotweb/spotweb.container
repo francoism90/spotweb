@@ -8,6 +8,8 @@ After=spotweb-mariadb.container
 Image=ghcr.io/francoism90/spotweb:latest
 AutoUpdate=registry
 UserNS=keep-id
+Environment=PUID=1000
+Environment=PGID=1000
 Volume=%h/workspace/spotweb/dbsettings.inc.php:/app/dbsettings.inc.php:rw,z
 Network=spotweb.network
 PublishPort=8000:8000

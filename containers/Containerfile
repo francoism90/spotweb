@@ -17,18 +17,18 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezo
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    git curl ca-certificates libcap2-bin zip unzip \
+    git curl ca-certificates libcap2-bin zip unzip gosu \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create non-root user
-RUN groupadd --force -g ${GID} docker \
-    && useradd -u ${UID} -g docker -d /home/docker -s /bin/bash -m docker
+RUN groupadd --force -g ${GID} spotweb \
+    && useradd -u ${UID} -g spotweb -d /home/spotweb -s /bin/bash -m spotweb
 
 # Create directories and set ownership
 RUN mkdir -p /app /config /data \
-    && chown -R docker:docker /app /config /data
+    && chown -R spotweb:spotweb /app /config /data
 
 # PHP Configuration
 RUN cp ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
@@ -53,14 +53,19 @@ RUN setcap -r /usr/local/bin/frankenphp
 # Install Spotweb
 RUN rm -rf /app/* \
     && git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app \
-    && chown -R docker:docker /app \
+    && chown -R spotweb:spotweb /app \
     && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md
 
 # Copy configuration files
-COPY --chown=docker:docker containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
+COPY --chown=spotweb:spotweb containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
 
-# Run as root so the entrypoint can renumber the "docker" user to the
+# Entrypoint
+COPY --chmod=755 containers/runtimes/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Run as root so the entrypoint can renumber the "spotweb" user to the
 # runtime PUID/PGID before dropping privileges
-USER docker
+USER root
 
 EXPOSE 8000
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
