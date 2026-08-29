@@ -22,3 +22,8 @@ database schema and initial settings.
 ## Usage
 
 After install, it should be available at <http://localhost:8000/>.
+
+## Production
+
+For production use, store database credentials in Podman secrets instead of
+plain files or environment variables.
