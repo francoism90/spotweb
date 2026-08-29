@@ -6,7 +6,12 @@ BindsTo=spotweb.container
 [Container]
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
-EnvironmentFile=%h/.config/containers/systemd/spotweb/config/mariadb.env
+Environment=MARIADB_AUTO_UPGRADE=true
+Environment=MARIADB_ROOT_HOST=%
+Environment=MARIADB_DATABASE=spotweb
+Environment=MARIADB_USER=user
+Environment=MARIADB_PASSWORD=password
+Environment=MARIADB_ROOT_PASSWORD=password
 NoNewPrivileges=true
 ShmSize=100m
 Volume=spotweb-mariadb:/var/lib/mysql:rw,Z,U

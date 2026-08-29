@@ -1,9 +1,0 @@
-[Build]
-Environment=UID=${UID}
-Environment=GID=${GID}
-ImageTag=localhost/spotweb:latest
-File=containers/Containerfile
-SetWorkingDirectory=${APP_PATH}
-
-[Service]
-EnvironmentFile=%h/.config/containers/systemd/spotweb/config/app.env
