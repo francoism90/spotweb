@@ -68,4 +68,7 @@ USER root
 
 EXPOSE 8000
 
+# CMD is redeclared because ENTRYPOINT resets the base image's inherited one
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]
