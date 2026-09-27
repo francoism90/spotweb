@@ -3,6 +3,9 @@
 Description=Spotweb container
 Requires=spotweb-mariadb.container
 After=spotweb-mariadb.container
+# Started on demand by spotweb-ondemand.socket, and stopped again once
+# the socket proxy exits after being idle.
+StopWhenUnneeded=yes
 
 [Container]
 Image=ghcr.io/francoism90/spotweb:latest
@@ -12,7 +15,18 @@ Environment=PUID=1000
 Environment=PGID=1000
 Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
 Network=spotweb.network
-PublishPort=8000:8000
+# Only the socket proxy connects here; spotweb-ondemand.socket owns port 8000.
+PublishPort=127.0.0.1:18000:8000
+# Ready as soon as FrankenPHP serves a static file, so the first request
+# waits for it instead of failing.
+Notify=healthy
+HealthStartupCmd=curl -fsS -o /dev/null http://127.0.0.1:8000/favicon.ico
+HealthStartupInterval=1s
+HealthStartupTimeout=5s
+HealthCmd=curl -fsS -o /dev/null http://127.0.0.1:8000/favicon.ico
+HealthInterval=1m
+HealthTimeout=5s
+HealthRetries=3
 
 [Service]
 Restart=always

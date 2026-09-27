@@ -1,0 +1,23 @@
+# FileName=spotweb-retrieve
+[Unit]
+Description=Spotweb retrieve job
+Requires=spotweb-mariadb.container
+After=spotweb-mariadb.container
+
+[Container]
+Image=ghcr.io/francoism90/spotweb:latest
+AutoUpdate=registry
+UserNS=keep-id
+Environment=PUID=1000
+Environment=PGID=1000
+Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
+Network=spotweb.network
+HealthCmd=none
+Exec=php /app/retrieve.php
+
+[Service]
+# Run once per spotweb-retrieve.timer trigger. A first retrieve can take
+# hours, so there's no start timeout.
+Type=oneshot
+TimeoutStartSec=infinity
+TimeoutStopSec=30

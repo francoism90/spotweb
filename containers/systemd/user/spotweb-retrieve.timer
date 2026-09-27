@@ -1,0 +1,11 @@
+[Unit]
+Description=Spotweb retrieve timer
+
+[Timer]
+OnCalendar=hourly
+# Catch up on a missed run after the host was off.
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target
