@@ -17,7 +17,14 @@ if [ "$(id -u)" = '0' ]; then
         usermod -o -u "${PUID}" spotweb
     fi
 
-    chown -R spotweb:spotweb /app /data /etc/spotweb /config
+    # Only when the top-level directory is still owned by someone else:
+    # containers start often (on each first request, and hourly for the
+    # retrieve job), and /app holds all of Spotweb.
+    for dir in /app /data /etc/spotweb /config; do
+        if [ -d "${dir}" ] && [ "$(stat -c '%u:%g' "${dir}")" != "${PUID}:${PGID}" ]; then
+            chown -R spotweb:spotweb "${dir}"
+        fi
+    done
 
     exec gosu spotweb "$0" "$@"
 fi

@@ -1,0 +1,8 @@
+[Unit]
+Description=Spotweb on-demand socket
+
+[Socket]
+ListenStream=8000
+
+[Install]
+WantedBy=sockets.target

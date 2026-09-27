@@ -1,5 +1,8 @@
 [Unit]
 Description=MariaDB container
+# Started with Spotweb or the retrieve job, and stopped again once neither
+# needs it.
+StopWhenUnneeded=yes
 
 [Container]
 Image=docker.io/library/mariadb:latest
@@ -15,6 +18,16 @@ ShmSize=100m
 Volume=spotweb-mariadb.volume:/var/lib/mysql:rw,Z,U
 Network=spotweb.network
 ExposeHostPort=3306
+# Only counts as started once it accepts connections, so Spotweb and the
+# retrieve job don't connect too early.
+Notify=healthy
+HealthStartupCmd=healthcheck.sh --connect --innodb_initialized
+HealthStartupInterval=1s
+HealthStartupTimeout=5s
+HealthCmd=healthcheck.sh --connect --innodb_initialized
+HealthInterval=1m
+HealthTimeout=5s
+HealthRetries=3
 
 [Service]
 Restart=always
