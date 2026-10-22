@@ -54,6 +54,7 @@ RUN setcap -r /usr/local/bin/frankenphp
 RUN rm -rf /app/* \
     && git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app \
     && chown -R spotweb:spotweb /app \
+    && sed -i '/^error_reporting(2147483647);/d' /app/*.php /app/bin/*.php \
     && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md
 
 # Copy configuration files
