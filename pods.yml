@@ -8,10 +8,8 @@ category: Media
 website: https://github.com/spotweb/spotweb
 repository: https://github.com/francoism90/spotweb
 notes: >-
-    Run the installer at /install.php once the units are up. The hourly
-    retrieve job is a plain systemd timer, which Pods doesn't install: copy
-    containers/systemd/user/spotweb-retrieve.timer to ~/.config/systemd/user
-    and run "systemctl --user enable --now spotweb-retrieve.timer".
+    Run the installer at /install.php once the units are up. Until then, the
+    hourly retrieve job fails.
 
 sources:
     production:
@@ -27,3 +25,12 @@ ondemand:
     port: 8000
     app_port: 8000
     idle_timeout: 10min
+
+timers:
+    retrieve:
+        description: Fetches new spots from the Usenet server
+        container: spotweb-retrieve
+        on_calendar: hourly
+        # Catch up on a missed run after the host was off.
+        persistent: true
+        randomized_delay_sec: 5min
