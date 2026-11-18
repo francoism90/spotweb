@@ -1,0 +1,29 @@
+version: 1
+name: spotweb
+label: Spotweb
+description: Decentralized Usenet community based on the Spotnet protocol
+author: francoism90
+icon: i-lucide-newspaper
+category: Media
+website: https://github.com/spotweb/spotweb
+repository: https://github.com/francoism90/spotweb
+notes: >-
+    Run the installer at /install.php once the units are up. The hourly
+    retrieve job is a plain systemd timer, which Pods doesn't install: copy
+    containers/systemd/user/spotweb-retrieve.timer to ~/.config/systemd/user
+    and run "systemctl --user enable --now spotweb-retrieve.timer".
+
+sources:
+    production:
+        path: containers/systemd/spotweb
+        description: The published image
+
+routes:
+    app:
+        upstream: systemd-spotweb:8000
+        description: The web interface
+
+ondemand:
+    port: 8000
+    app_port: 8000
+    idle_timeout: 10min

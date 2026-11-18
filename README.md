@@ -10,17 +10,40 @@ responsible for the content indexed or how this instance is used.
 
 ## Install
 
-The Quadlet files in `containers/systemd/spotweb` define the Spotweb and
-MariaDB containers. The units in `containers/systemd/user` start them on
-demand and run the hourly retrieve job; Quadlet can't generate sockets or
-timers, so they're plain systemd units.
+### With Pods
+
+In [Pods](https://github.com/foxws/pods), open **Install application**,
+**Git repository**, and enter this repository's URL. Pods reads `pods.yml`,
+offers a hostname for the web interface when the host has the Pods proxy, and
+can turn on **On demand** for it. Pods doesn't install plain systemd units, so
+add the retrieve timer yourself:
 
 ```bash
-mkdir -p ~/.config/containers/systemd ~/.config/systemd/user
-cp -r containers/systemd/spotweb ~/.config/containers/systemd/
-cp containers/systemd/user/* ~/.config/systemd/user/
+cp containers/systemd/user/spotweb-retrieve.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user enable --now spotweb-ondemand.socket spotweb-retrieve.timer
+systemctl --user enable --now spotweb-retrieve.timer
+```
+
+### By hand
+
+The Quadlet files in `containers/systemd/spotweb` define the Spotweb and
+MariaDB containers. [lpod](https://github.com/foxws/lpod) adds the socket that
+starts Spotweb on demand:
+
+```bash
+podman quadlet install --application=spotweb containers/systemd/spotweb
+cp containers/systemd/user/spotweb-retrieve.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+lpod spotweb ondemand enable --port 8000 --app-port 8000
+systemctl --user enable --now spotweb-retrieve.timer
+```
+
+Without lpod, start it with `systemctl --user start spotweb` and publish its
+port in a drop-in, such as `spotweb.container.d/ports.conf`:
+
+```ini
+[Container]
+PublishPort=127.0.0.1:8000:8000
 ```
 
 On a server, also run `loginctl enable-linger` once, so the socket and timer
@@ -41,17 +64,12 @@ After install, it should be available at <http://localhost:8000/>.
 
 ### Scale to zero
 
-Nothing runs until the first request. A systemd socket listens on port 8000;
-the first connection starts MariaDB and Spotweb, and the request waits until
-both are ready. After 10 minutes without traffic, both stop again. To change
-that, edit `--exit-idle-time=` in `spotweb-ondemand.service`.
-
-- `systemctl --user start spotweb` doesn't keep Spotweb running: nothing needs
-  it, so systemd stops it again. Open it in the browser instead.
-- Running another app that uses ports 8000 or 18000 on the same host? Change
-  `ListenStream=` in `spotweb-ondemand.socket`, and the `PublishPort=` in
-  `spotweb.container` together with the proxy's target in
-  `spotweb-ondemand.service`.
+With on-demand on, nothing runs until the first request. A systemd socket
+listens on port 8000; the first connection starts MariaDB and Spotweb, and the
+request waits until both are ready. After 10 minutes without traffic, both
+stop again. Change the port or the idle timeout on the application's page in
+Pods, or with `lpod spotweb ondemand enable --port PORT --app-port 8000
+--idle-timeout 60min`, and turn it off with `lpod spotweb ondemand disable`.
 
 ### Retrieving spots
 

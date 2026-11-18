@@ -8,14 +8,17 @@ After=spotweb-mariadb.container
 Image=ghcr.io/francoism90/spotweb:latest
 AutoUpdate=registry
 UserNS=keep-id
-Environment=PUID=1000
-Environment=PGID=1000
+# The host user's IDs, since UserNS=keep-id maps them into the container.
+Environment=PUID=%U
+Environment=PGID=%G
 Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
 Network=spotweb.network
 HealthCmd=none
 Exec=php /app/retrieve.php
 
 [Service]
+# Podman doesn't create bind-mounted directories itself.
+ExecStartPre=/usr/bin/mkdir -p %h/workspace/spotweb/config
 # Run once per spotweb-retrieve.timer trigger. A first retrieve can take
 # hours, so there's no start timeout.
 Type=oneshot
