@@ -19,8 +19,9 @@ Exec=php /app/retrieve.php
 [Service]
 # Podman doesn't create bind-mounted directories itself.
 ExecStartPre=/usr/bin/mkdir -p %h/workspace/spotweb/config
-# Run once per spotweb-retrieve.timer trigger. A first retrieve can take
-# hours, so there's no start timeout.
+# Run once per trigger of spotweb-retrieve.timer, which lpod writes from
+# timers: in pods.yml. A first retrieve can take hours, so there's no start
+# timeout.
 Type=oneshot
 TimeoutStartSec=infinity
 TimeoutStopSec=30
