@@ -8,7 +8,7 @@ StopWhenUnneeded=yes
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
 Environment=MARIADB_AUTO_UPGRADE=true
-Environment=MARIADB_ROOT_HOST=%
+Environment=MARIADB_ROOT_HOST=%%
 Environment=MARIADB_DATABASE=spotweb
 Environment=MARIADB_USER=user
 Environment=MARIADB_PASSWORD=password

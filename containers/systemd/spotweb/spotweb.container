@@ -3,20 +3,19 @@
 Description=Spotweb container
 Requires=spotweb-mariadb.container
 After=spotweb-mariadb.container
-# Started on demand by spotweb-ondemand.socket, and stopped again once
-# the socket proxy exits after being idle.
-StopWhenUnneeded=yes
 
 [Container]
 Image=ghcr.io/francoism90/spotweb:latest
 AutoUpdate=registry
 UserNS=keep-id
-Environment=PUID=1000
-Environment=PGID=1000
+# The host user's IDs, since UserNS=keep-id maps them into the container.
+Environment=PUID=%U
+Environment=PGID=%G
 Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
 Network=spotweb.network
-# Only the socket proxy connects here; spotweb-ondemand.socket owns port 8000.
-PublishPort=127.0.0.1:18000:8000
+# For the Pods proxy, which reaches it by name. "lpod spotweb ondemand
+# enable" publishes it on 127.0.0.1 behind a socket in a drop-in.
+ExposeHostPort=8000
 # Ready as soon as FrankenPHP serves a static file, so the first request
 # waits for it instead of failing.
 Notify=healthy
@@ -29,7 +28,12 @@ HealthTimeout=5s
 HealthRetries=3
 
 [Service]
+# Podman doesn't create bind-mounted directories itself.
+ExecStartPre=/usr/bin/mkdir -p %h/workspace/spotweb/config
 Restart=always
 RestartSec=5
 TimeoutStartSec=90
 TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target
