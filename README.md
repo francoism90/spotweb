@@ -63,7 +63,7 @@ start at boot without logging in.
 Once it runs, create the database schema:
 
 ```bash
-podman exec -u spotweb systemd-spotweb php /app/bin/upgrade-db.php
+podman exec -u spotweb systemd-spotweb spotweb-upgrade
 ```
 
 Run it again after each image update.

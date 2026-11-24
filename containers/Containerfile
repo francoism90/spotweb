@@ -1,4 +1,8 @@
-FROM docker.io/dunglas/frankenphp:latest
+# FrankenPHP 1 with PHP 8.6, pinned so a new PHP release doesn't break the
+# weekly build. Pass --build-arg FRANKENPHP_VERSION=... for another one.
+ARG FRANKENPHP_VERSION=1-php8.6
+
+FROM docker.io/dunglas/frankenphp:${FRANKENPHP_VERSION}
 
 ARG UID=1000
 ARG GID=1000
@@ -17,7 +21,7 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezo
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    git curl ca-certificates libcap2-bin zip unzip gosu \
+    curl ca-certificates gosu \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -33,11 +37,8 @@ RUN mkdir -p /app \
 # PHP Configuration
 RUN cp ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 
-# Install PHP extensions
-RUN install-php-extensions @composer \
-    apcu bcmath exif ffi gd opcache \
-    igbinary imagick inotify intl \
-    pdo_mysql gettext zip
+# Install the PHP extensions Spotweb uses that the base image lacks
+RUN install-php-extensions gd gettext intl mbstring pdo_mysql zip
 
 # Install additional PHP extensions if specified
 RUN if [ -n "$PHP_EXTENSIONS" ]; then \
@@ -47,22 +48,27 @@ fi
 # Custom PHP configuration
 COPY containers/runtimes/php-production.ini /usr/local/etc/php/conf.d/xx-php-user.ini
 
-# Strip file capabilities from frankenphp
-RUN setcap -r /usr/local/bin/frankenphp
-
-# Install Spotweb
-RUN rm -rf /app/* \
+# Strip file capabilities from frankenphp, and install Spotweb. libcap2-bin and
+# git are only needed here, so install and purge them within this layer.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libcap2-bin git \
+    && setcap -r /usr/local/bin/frankenphp \
+    && rm -rf /app/* \
     && git clone --depth 1 -b develop https://github.com/spotweb/spotweb.git /app \
     && chown -R spotweb:spotweb /app \
     && sed -i '/^error_reporting(2147483647);/d' /app/*.php /app/bin/*.php \
     && sed -i 's/set_time_limit(120);/set_time_limit(0);/' /app/lib/services/Retriever/*.php \
-    && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md
+    && rm -rf /app/.git /app/.github /app/.gitignore /app/.gitattributes /app/.coveralls.yml /app/.rnd /app/.scrutinizer.yml /app/.travis.yml /app/*.md \
+    && apt-get purge -y --auto-remove libcap2-bin git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Database settings, read from the environment
 COPY --chown=spotweb:spotweb containers/runtimes/dbsettings.inc.php /app/dbsettings.inc.php
 
-# Entrypoint
+# Entrypoint, and the database upgrade that Pods runs after installs and updates
 COPY --chmod=755 containers/runtimes/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=755 containers/runtimes/upgrade.sh /usr/local/bin/spotweb-upgrade
 
 # Run as root so the entrypoint can renumber the "spotweb" user to the
 # runtime PUID/PGID before dropping privileges
