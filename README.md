@@ -15,7 +15,8 @@ responsible for the content indexed or how this instance is used.
 In [Pods](https://github.com/foxws/pods), open **Install application**,
 **Git repository**, and enter this repository's URL. Pods reads `pods.yml`,
 offers a hostname for the web interface when the host has the Pods proxy, and
-can turn on **On demand** for it. It also sets up the hourly retrieve timer from
+can turn on **On demand** for it. It generates the database password, and
+creates the database once the units are up. It also sets up the hourly retrieve timer from
 the `timers:` section of `pods.yml`, and shows it on the application's page with
 **Run now**.
 
@@ -26,6 +27,7 @@ MariaDB containers. [lpod](https://github.com/foxws/lpod) adds the socket that
 starts Spotweb on demand, and the timer that runs the retrieve job:
 
 ```bash
+printf '%s' "$(openssl rand -base64 24)" | podman secret create spotweb-db-password -
 podman quadlet install --application=spotweb containers/systemd/spotweb
 lpod spotweb ondemand enable --port 8000 --app-port 8000
 echo '{"timers": [{"name": "retrieve", "container": "spotweb-retrieve", "on_calendar": "hourly", "persistent": true, "randomized_delay_sec": "5min"}]}' \
@@ -58,18 +60,24 @@ WantedBy=timers.target
 On a server, also run `loginctl enable-linger` once, so the socket and timer
 start at boot without logging in.
 
-On first boot, the container seeds `config/dbsettings.inc.php` on the host from
-the image's bundled default (already pointed at the included MariaDB
-container). That file is bind-mounted into the container and symlinked to
-`/app/dbsettings.inc.php`, so anything Spotweb itself writes there — such as
-during install — persists automatically; no manual copying required.
+Once it runs, create the database schema:
 
-Run the installer at <http://localhost:8000/install.php> to set up the
-database schema and initial settings.
+```bash
+podman exec -u spotweb systemd-spotweb php /app/bin/upgrade-db.php
+```
+
+Run it again after each image update.
+
+The image reads its database settings from the environment (`DB_HOST`,
+`DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`), and the password comes
+from the `spotweb-db-password` secret. The installer at `/install.php` isn't
+used.
 
 ## Usage
 
-After install, it should be available at <http://localhost:8000/>.
+After install, it should be available at <http://localhost:8000/>. Sign in as
+`admin` with password `admin`, change the password, and enter your Usenet server
+under **Settings**.
 
 ### Scale to zero
 
@@ -86,10 +94,5 @@ Pods, or with `lpod spotweb ondemand enable --port PORT --app-port 8000
 container, starting MariaDB for it if needed. Run it by hand with **Run now** in
 Pods, `lpod spotweb timers run retrieve --json` or
 `systemctl --user start spotweb-retrieve`, and follow it with
-`journalctl --user -u spotweb-retrieve -f`. Runs fail until the installer has
-set up the database.
-
-## Production
-
-For production use, store database credentials in Podman secrets instead of
-plain files or environment variables.
+`journalctl --user -u spotweb-retrieve -f`. Runs fail until the Usenet server is
+set.

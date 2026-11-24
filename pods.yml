@@ -8,13 +8,32 @@ category: Media
 website: https://github.com/spotweb/spotweb
 repository: https://github.com/francoism90/spotweb
 notes: >-
-    Run the installer at /install.php once the units are up. Until then, the
-    hourly retrieve job fails.
+    Sign in as admin with password admin, change it, and enter your Usenet
+    server under Settings. Until then, the hourly retrieve job fails.
 
 sources:
     production:
         path: containers/systemd/spotweb
         description: The published image
+
+secrets:
+    spotweb-db-password:
+        description: Password of the Spotweb database
+        generate: true
+
+after_install:
+    database:
+        label: Create the database
+        container: spotweb
+        user: spotweb
+        command: php /app/bin/upgrade-db.php
+
+after_update:
+    upgrade:
+        label: Upgrade the database
+        container: spotweb
+        user: spotweb
+        command: php /app/bin/upgrade-db.php
 
 routes:
     app:

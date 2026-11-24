@@ -8,16 +8,15 @@ StopWhenUnneeded=yes
 Image=docker.io/library/mariadb:latest
 AutoUpdate=registry
 Environment=MARIADB_AUTO_UPGRADE=true
-Environment=MARIADB_ROOT_HOST=%%
 Environment=MARIADB_DATABASE=spotweb
-Environment=MARIADB_USER=user
-Environment=MARIADB_PASSWORD=password
-Environment=MARIADB_ROOT_PASSWORD=password
+Environment=MARIADB_USER=spotweb
+Secret=spotweb-db-password,type=env,target=MARIADB_PASSWORD
+# Spotweb only needs its own user.
+Environment=MARIADB_RANDOM_ROOT_PASSWORD=1
 NoNewPrivileges=true
 ShmSize=100m
 Volume=spotweb-mariadb.volume:/var/lib/mysql:rw,Z,U
 Network=spotweb.network
-ExposeHostPort=3306
 # Only counts as started once it accepts connections, so Spotweb and the
 # retrieve job don't connect too early.
 Notify=healthy

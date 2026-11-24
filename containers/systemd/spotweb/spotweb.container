@@ -11,7 +11,7 @@ UserNS=keep-id
 # The host user's IDs, since UserNS=keep-id maps them into the container.
 Environment=PUID=%U
 Environment=PGID=%G
-Volume=%h/workspace/spotweb/config:/etc/spotweb:rw,z
+Secret=spotweb-db-password,type=env,target=DB_PASSWORD
 Network=spotweb.network
 # For the Pods proxy, which reaches it by name. "lpod spotweb ondemand
 # enable" publishes it on 127.0.0.1 behind a socket in a drop-in.
@@ -28,8 +28,6 @@ HealthTimeout=5s
 HealthRetries=3
 
 [Service]
-# Podman doesn't create bind-mounted directories itself.
-ExecStartPre=/usr/bin/mkdir -p %h/workspace/spotweb/config
 Restart=always
 RestartSec=5
 TimeoutStartSec=90

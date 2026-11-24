@@ -20,7 +20,7 @@ if [ "$(id -u)" = '0' ]; then
     # Only when the top-level directory is still owned by someone else:
     # containers start often (on each first request, and hourly for the
     # retrieve job), and /app holds all of Spotweb.
-    for dir in /app /data /etc/spotweb /config; do
+    for dir in /app /data /config; do
         if [ -d "${dir}" ] && [ "$(stat -c '%u:%g' "${dir}")" != "${PUID}:${PGID}" ]; then
             chown -R spotweb:spotweb "${dir}"
         fi
@@ -28,17 +28,6 @@ if [ "$(id -u)" = '0' ]; then
 
     exec gosu spotweb "$0" "$@"
 fi
-
-# Seed the persisted config on first run, then point Spotweb's own
-# dbsettings.inc.php path at it so writes (e.g. from install.php) land on
-# the host-mounted /etc/spotweb volume instead of the container's writable
-# layer. Kept out of /config and /data -- FrankenPHP/Caddy already use those
-# (XDG_CONFIG_HOME/XDG_DATA_HOME) for their own autosave config and TLS state.
-if [ ! -f /etc/spotweb/dbsettings.inc.php ]; then
-    cp /usr/local/share/spotweb/dbsettings.inc.php.dist /etc/spotweb/dbsettings.inc.php
-fi
-
-ln -sf /etc/spotweb/dbsettings.inc.php /app/dbsettings.inc.php
 
 # Hand off to the base frankenphp image's own entrypoint, which turns the
 # inherited CMD (--config /etc/frankenphp/Caddyfile --adapter caddyfile)
