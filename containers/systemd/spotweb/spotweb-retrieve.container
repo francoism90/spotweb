@@ -7,10 +7,6 @@ After=spotweb-mariadb.container
 [Container]
 Image=ghcr.io/francoism90/spotweb:latest
 AutoUpdate=registry
-UserNS=keep-id
-# The host user's IDs, since UserNS=keep-id maps them into the container.
-Environment=PUID=%U
-Environment=PGID=%G
 Secret=spotweb-db-password,type=env,target=DB_PASSWORD
 Network=spotweb.network
 HealthCmd=none

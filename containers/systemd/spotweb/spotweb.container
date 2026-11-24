@@ -7,11 +7,11 @@ After=spotweb-mariadb.container
 [Container]
 Image=ghcr.io/francoism90/spotweb:latest
 AutoUpdate=registry
-UserNS=keep-id
-# The host user's IDs, since UserNS=keep-id maps them into the container.
-Environment=PUID=%U
-Environment=PGID=%G
 Secret=spotweb-db-password,type=env,target=DB_PASSWORD
+# FrankenPHP's Caddy state (XDG_DATA_HOME and XDG_CONFIG_HOME), such as its
+# local CA, kept across restarts.
+Volume=spotweb-data.volume:/data:rw,Z
+Volume=spotweb-config.volume:/config:rw,Z
 Network=spotweb.network
 # For the Pods proxy, which reaches it by name. "lpod spotweb ondemand
 # enable" publishes it on 127.0.0.1 behind a socket in a drop-in.
